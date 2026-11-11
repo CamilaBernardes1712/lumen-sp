@@ -5,15 +5,178 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lumen SP | Acervo Digital Inclusivo</title>
     <link rel="stylesheet" href="style.css">
-    
-    <!-- Configuração do PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e293b">
 </head>
 <body>
-    <!-- Cabeçalho, navegação e conteúdo do site ficam aqui... -->
+    <!-- Cabeçalho -->
+<header>
+    <div class="container header-content">
+        <div class="logo-area">
+            <!-- Imagem do logotipo/cabeçalho em destaque -->
+            <img src="assets/lumensp-cabecalho.png" alt="Lumen SP - Acervo Digital" class="img-cabecalho">
+        </div>
+        <div class="user-area" id="user-area" style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
+            <input type="text" id="login-nome" placeholder="Seu nome" style="width: 200px !important; padding: 0.6rem 0.8rem !important; background: #FFFCF6 !important; border: 1px solid var(--cor-borda) !important; border-radius: 4px !important; font-size: 0.95rem !important; color: var(--cor-texto) !important; outline: none;" onfocus="this.style.outline='2px solid var(--cor-destaque)'; this.style.outlineOffset='2px';" onblur="this.style.outline='none';">
+    
+            <input type="email" id="login-email" placeholder="Seu e-mail" style="width: 200px !important; padding: 0.6rem 0.8rem !important; background: #FFFCF6 !important; border: 1px solid var(--cor-borda) !important; border-radius: 4px !important; font-size: 0.95rem !important; color: var(--cor-texto) !important; outline: none;" onfocus="this.style.outline='2px solid var(--cor-destaque)'; this.style.outlineOffset='2px';" onblur="this.style.outline='none';">
+    
+            <button onclick="fazerLogin()" class="btn-pequeno" style="margin-left: 0.2rem;">Entrar</button>
+        </div>
+    </div>
+</header>
 
-    <!-- Script de registro do Service Worker -->
+    <!-- Menu Horizontal -->
+    <nav class="main-nav">
+        <div class="container nav-container">
+            <a href="#" onclick="mudarSecao('inicio')">Início</a>
+            
+            <!-- Acervo Digital com Dropdown de Gêneros -->
+<div class="dropdown">
+    
+    <a href="#" onclick="filtrarCategoria('todos'); return false;">Acervo Digital ▼</a>
+    <div class="dropdown-content">
+        <a href="#" onclick="filtrarCategoria('Todos os Livros'); return false;">Todos os Livros</a>
+        <a href="#" onclick="filtrarCategoria('Matemática'); return false;">Matemática</a>
+        <a href="#" onclick="filtrarCategoria('Ciência da Computação'); return false;">Ciência da Computação</a>
+        <a href="#" onclick="filtrarCategoria('Direito'); return false;">Direito</a>
+        <a href="#" onclick="filtrarCategoria('Economia'); return false;">Economia</a>
+        <a href="#" onclick="filtrarCategoria('Filosofia'); return false;">Filosofia</a>
+        <a href="#" onclick="filtrarCategoria('História'); return false;">História</a>
+        <a href="#" onclick="filtrarCategoria('Letras'); return false;">Letras</a>
+        <a href="#" onclick="filtrarCategoria('Poesia'); return false;">Poesia</a>
+        <a href="#" onclick="filtrarCategoria('Romance'); return false;">Romance</a>
+        <a href="#" onclick="filtrarCategoria('Teatro'); return false;">Teatro</a>
+    </div>
+</div>
+
+            <a href="#" onclick="mudarSecao('em-alta')">Em Alta</a>
+            <a href="#" onclick="mudarSecao('forum')">Fórum</a>
+            <a href="#" onclick="mudarSecao('contato')">Contato</a>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Dinâmico -->
+    <main class="container">
+        
+        <!-- SEÇÃO: INÍCIO -->
+<section id="sec-inicio" class="pagina-secao">
+    <div class="welcome-box">
+        <h2>Bem-vindo ao Lumen SP!</h2>
+        <p style="font-size: 1.1rem; font-style: italic; color: var(--cor-destaque); margin-bottom: 1.2rem;">Um espaço dedicado ao conhecimento, à leitura e à descoberta.</p>
+        
+        <p style="margin-bottom: 1rem;">O <strong>Lumen SP</strong> é um acervo digital voltado especialmente aos estudantes do ensino médio e das universidades do estado de São Paulo, reunindo livros de diferentes áreas do conhecimento e da literatura em um só lugar.</p>
+        
+        <p style="margin-bottom: 1rem;">Aqui, você poderá explorar obras de Ciência da Computação, Direito, Economia, Filosofia, História, Letras, Matemática, Poesia, Romance e Teatro, ampliando seus conhecimentos, descobrindo novas perspectivas e encontrando inspiração em cada leitura.</p>
+        
+        <p style="margin-bottom: 1rem;">Seja para estudar, pesquisar ou simplesmente apreciar o prazer de ler, este espaço é seu.</p>
+        
+        <p style="font-weight: 500; color: var(--cor-principal); margin-top: 1.5rem; margin-bottom: 1.5rem;">Todos são bem-vindos. Abra um livro, ilumine suas ideias e descubra novos horizontes.</p>
+        
+        <button onclick="mudarSecao('acervo')" class="btn" style="margin-top: 10px;">Explorar Acervo Digital</button>
+    </div>
+</section>
+        <!-- SEÇÃO: ACERVO DIGITAL -->
+        <section id="sec-acervo" class="pagina-secao" style="display: none;">
+            <div class="layout-acervo">
+                <!-- Menu Lateral Esquerdo -->
+                <aside class="sidebar-generos">
+                    <h3>Acervo Digital</h3>
+                    <ul>
+                        <li><a href="#" onclick="filtrarCategoria('Todos os Livros')">📁 Todos os Livros</a></li>
+                        <li><a href="#" onclick="filtrarCategoria('Ciência da Computação')">Ciência da Computação</a></li>
+                        <li><a href="#" onclick="filtrarCategoria('Direito')">Direito</a></li>
+                        <li><a href="#" onclick="filtrarCategoria('Economia')">Economia</a></li>
+                        <li><a href="#" onclick="filtrarCategoria('Filosofia')">Filosofia</a></li>
+                        <li><a href="#" onclick="filtrarCategoria('História')">História</a></li>
+                        <li><a href="#" onclick="filtrarCategoria('Letras')">Letras</a></li>
+                        <li><a href="#" onclick="filtrarCategoria('Matemática')">Matemática</a></li>
+                        <li><a href="#" onclick="filtrarCategoria('Poesia')">Poesia</a></li>
+                        <li><a href="#" onclick="filtrarCategoria('Romance')">Romance</a></li>
+                        <li><a href="#" onclick="filtrarCategoria('Teatro')">Teatro</a></li>
+                    </ul>
+                </aside>
+
+                <!-- Listagem de Livros -->
+                <div class="conteudo-acervo">
+                    <input type="text" id="input-busca" placeholder="🔍 Busque por título, autor ou palavra-chave..." onkeyup="buscarLivros()">
+                    <h2 id="titulo-categoria" style="margin-top: 15px;">Todos os Livros Disponíveis</h2>
+                    <div id="grid-livros" class="card-grid"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: DETALHES DO LIVRO -->
+        <section id="sec-detalhes" class="pagina-secao" style="display: none;">
+            <button onclick="mudarSecao('acervo')" class="btn-voltar">← Voltar ao Acervo</button>
+            <div id="detalhe-livro-conteudo" class="detalhe-box"></div>
+        </section>
+
+        <!-- SEÇÃO: EM ALTA (MAIS BAIXADOS) -->
+        <section id="sec-em-alta" class="pagina-secao" style="display: none;">
+            <h2>🔥 Livros em Alta</h2>
+            <p>Confira as obras com maior engajamento e número de downloads pela comunidade estudantil.</p>
+            <div id="grid-em-alta" class="card-grid" style="margin-top: 20px;"></div>
+        </section>
+
+        <!-- SEÇÃO: FÓRUM -->
+        <section id="sec-forum" class="pagina-secao" style="display: none;">
+            <h2>💬 Fórum de Discussões e Debates</h2>
+            <p>Compartilhe perguntas, tire dúvidas e debata temas específicos separados por gênero.</p>
+            
+            <div class="forum-box">
+                <form id="forum-form" onsubmit="publicarTopico(event)">
+                    <select id="forum-genero" required>
+                        <option value="">Selecione o Gênero do Tópico</option>
+                        <option value="Ciência da Computação">Ciência da Computação</option>
+                        <option value="Direito">Direito</option>
+                        <option value="Economia">Economia</option>
+                        <option value="Filosofia">Filosofia</option>
+                        <option value="História">História</option>
+                        <option value="Letras">Letras</option>
+                        <option value="Matemática">Matemática</option>
+                        <option value="Poesia">Poesia</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Teatro">Teatro</option>
+                    </select>
+                    <input type="text" id="forum-titulo" placeholder="Título da discussão ou pergunta" required>
+                    <textarea id="forum-texto" placeholder="Escreva sua pergunta ou compartilhe seu conhecimento..." rows="3" required></textarea>
+                    <button type="submit" class="btn">Publicar Tópico</button>
+                </form>
+
+                <div id="lista-topicos" style="margin-top: 25px;"></div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: CONTATO (Formspree) -->
+        <section id="sec-contato" class="pagina-secao" style="display: none;">
+            <div class="contato-box">
+                <h2>📬 Contato</h2>
+                <p>Dúvidas, sugestões ou reclamações? Envie uma mensagem para nossa equipe:📝</p>
+                
+                <form action="https://formspree.io/f/mrpponww" method="POST" class="form-contato">
+                    <label>Nome:</label>
+                    <input type="text" name="nome" placeholder="Digite seu nome" required>
+                    
+                    <label>E-mail:</label>
+                    <input type="email" name="email" placeholder="contato@email.com" required>
+                    
+                    <label>Mensagem:</label>
+                    <textarea name="mensagem" rows="5" placeholder="Escreva sua mensagem" required></textarea>
+                    
+                    <button type="submit" class="btn" style="margin-top: 10px;">Enviar Mensagem</button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>&copy; 2026-2027 Lumen SP | Desenvolvido por Camila Bernardes Amorim (RU 5409526)</p>
+    </footer>
+
+    <script src="script.js"></script>
     <script>
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js')
@@ -21,6 +184,5 @@
           .catch((error) => console.log("Falha ao registrar Service Worker:", error));
       }
     </script>
-    <script src="script.js"></script>
 </body>
 </html>

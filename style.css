@@ -1,133 +1,765 @@
+
+/* =====================================================
+   LUMEN SP
+   Acervo Digital | Biblioteca Acadêmica
+   Identidade: Dark Academia / Clássica / Histórica
+   ===================================================== */
+
+
+/* 1. FONTES */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Roboto:wght@400;500;700&display=swap');
+
+
+/* 2. PALETA DE CORES E VARIÁVEIS */
+
+:root {
+    /* Cores institucionais */
+    --cor-principal: #111827;
+    --cor-secundaria: #1C2434;
+    --cor-luz: #C6A15B;
+    --cor-destaque: #A98243;
+
+    /* Cores de fundo */
+    --cor-fundo: #F3EBDD;
+    --cor-papel: #FFF9EF;
+    --cor-papel-escuro: #EEE4D2;
+
+    /* Cores de texto */
+    --cor-texto: #29251F;
+    --cor-texto-suave: #655B4D;
+    --cor-texto-claro: #D8C8AD;
+
+    /* Bordas */
+    --cor-borda: #D8C8AD;
+    --cor-borda-escura: #77613F;
+
+    /* Cores das categorias */
+    --cor-computacao: #172B40;
+    --cor-direito: #702B35;
+    --cor-economia: #244C3C;
+    --cor-filosofia: #49345D;
+    --cor-historia: #86552D;
+    --cor-letras: #234B50;
+    --cor-matematica: #293B69;
+    --cor-poesia: #762D49;
+    --cor-romance: #24433B;
+    --cor-teatro: #6A2933;
+
+    /* Efeitos */
+    --sombra-suave: 0 4px 14px rgba(35, 27, 17, 0.08);
+    --sombra-livro: 0 8px 22px rgba(17, 24, 39, 0.15);
+
+    /* Formas */
+    --raio: 6px;
+}
+
+
+/* 3. CONFIGURAÇÕES GERAIS */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
-    background-color: #f4f6f9;
-    color: #333;
-    line-height: 1.6;
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+    line-height: 1.7;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    color: var(--cor-principal);
+    line-height: 1.3;
+}
+
+p {
+    margin-bottom: 0.8rem;
+}
+
+a {
+    transition: color 0.2s ease;
 }
 
 .container {
-    width: 90%;
-    max-width: 1100px;
-    margin: auto;
+    width: min(92%, 1200px);
+    margin: 0 auto;
+}
+
+
+/* 4. CABEÇALHO */
+
+header {
+    background: var(--cor-principal);
+    color: var(--cor-papel);
+    padding: 1.5rem 0;
+    border-bottom: 3px solid var(--cor-luz);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* Logotipo */
+
+.logo-area h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: var(--cor-luz);
+    letter-spacing: 1px;
+}
+
+.logo-area p {
+    color: var(--cor-texto-claro);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1rem;
+}
+
+/* Ajuste para a imagem do cabeçalho / logotipo */
+.img-cabecalho {
+    max-width: 570px; 
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+}
+
+
+/* 5. ÁREA DO USUÁRIO */
+
+.user-box {
+    display: flex;
+    flex-direction: column; 
+    align-items: stretch;
+    gap: 0.6rem;
+    width: 320px; 
+    max-width: 100%;
+}
+
+.user-box input {
+    font-family: 'Roboto', sans-serif;
+    width: 100% !important; 
+    padding: 0.8rem !important;
+    border: 1px solid var(--cor-borda) !important;
+    border-radius: 4px !important;
+    background: #FFFCF6 !important;
+    color: var(--cor-texto) !important;
+    font-size: 1rem !important;
+    transition: outline 0.2s ease, border-color 0.2s ease;
+}
+
+.user-box input:focus {
+    outline: 2px solid var(--cor-destaque) !important;
+    outline-offset: 2px !important;
+}
+
+/* 6. MENU DE NAVEGAÇÃO */
+
+.main-nav {
+    background: var(--cor-secundaria);
+    padding: 0.9rem 0;
+    border-top: 1px solid #39404D;
+    border-bottom: 1px solid var(--cor-borda-escura);
+    box-shadow: var(--sombra-suave);
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    font-family: 'Roboto', sans-serif;
+}
+
+.main-nav a {
+    color: #E7DDCC;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.main-nav a:hover,
+.main-nav a:focus-visible {
+    color: var(--cor-luz);
+}
+
+
+/* 7. MENU SUSPENSO - DROPDOWN */
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--cor-secundaria);
+    min-width: 220px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    z-index: 10;
+    border-radius: var(--raio);
+    border: 1px solid var(--cor-borda-escura);
     overflow: hidden;
 }
 
-header {
-    background: #1e293b;
-    color: #fff;
-    padding: 2rem 0;
-    text-align: center;
-}
-
-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-nav {
-    background: #334155;
-    padding: 1rem 0;
-}
-
-nav .container {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-}
-
-nav a {
-    color: #fff;
+.dropdown-content a {
+    color: var(--cor-papel);
+    padding: 10px 15px;
     text-decoration: none;
-    font-weight: 600;
+    display: block;
+    font-size: 0.95rem;
 }
 
-nav a:hover {
-    color: #38bdf8;
+.dropdown-content a:hover,
+.dropdown-content a:focus-visible {
+    background-color: #30394A;
+    color: var(--cor-luz);
 }
+
+.dropdown:hover .dropdown-content,
+.dropdown:focus-within .dropdown-content {
+    display: block;
+}
+
+
+/* 8. CONTEÚDO PRINCIPAL */
 
 main {
-    padding: 2rem 0;
+    padding: 3rem 0;
+    min-height: 60vh;
 }
 
-section {
-    background: #fff;
-    margin-bottom: 2rem;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+
+/* 9. CAIXAS DE CONTEÚDO */
+
+.welcome-box,
+.detalhe-box,
+.contato-box,
+.forum-box {
+    background: var(--cor-papel);
+    padding: clamp(1.4rem, 4vw, 2.5rem);
+    border: 1px solid var(--cor-borda);
+    border-top: 3px solid var(--cor-luz);
+    border-radius: var(--raio);
+    box-shadow: var(--sombra-suave);
 }
 
-section h2 {
-    color: #1e293b;
+.welcome-box h2,
+.contato-box h2,
+.forum-box h2 {
+    color: var(--cor-principal);
+    margin-bottom: 1rem;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+}
+
+.welcome-box p {
+    max-width: 75ch;
     margin-bottom: 1rem;
 }
 
+
+/* 10. LAYOUT DO ACERVO */
+
+.layout-acervo {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+}
+
+/* Menu lateral de gêneros */
+
+.sidebar-generos {
+    flex: 0 0 250px;
+    background: var(--cor-papel);
+    padding: 1.5rem;
+    border: 1px solid var(--cor-borda);
+    border-left: 3px solid var(--cor-luz);
+    border-radius: var(--raio);
+    box-shadow: var(--sombra-suave);
+    height: fit-content;
+}
+
+.sidebar-generos h3 {
+    margin-bottom: 1rem;
+    color: var(--cor-principal);
+    border-bottom: 1px solid var(--cor-borda);
+    padding-bottom: 0.7rem;
+    font-size: 1.2rem;
+}
+
+.sidebar-generos ul {
+    list-style: none;
+}
+
+.sidebar-generos li {
+    margin-bottom: 0.7rem;
+}
+
+.sidebar-generos a {
+    text-decoration: none;
+    color: var(--cor-texto-suave);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.sidebar-generos a:hover,
+.sidebar-generos a:focus-visible {
+    color: var(--cor-destaque);
+}
+
+.conteudo-acervo {
+    flex: 1;
+    min-width: 0;
+}
+
+
+/* 11. GRADE DE LIVROS */
+
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(min(100%, 240px), 1fr)
+    );
     gap: 1.5rem;
     margin-top: 1.5rem;
 }
 
+
+/* 12. CARDS DOS LIVROS */
+
 .card {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    padding: 1.5rem;
-    border-radius: 6px;
+    background: var(--cor-papel);
+    border: 1px solid var(--cor-borda);
+    border-top: 3px solid var(--cor-luz);
+    padding: 1.25rem;
+    border-radius: var(--raio);
+
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
+    box-shadow: var(--sombra-suave);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-.card h3 {
-    color: #0f172a;
-    margin-bottom: 0.5rem;
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--sombra-livro);
 }
+
+
+/* 13. CAPAS DOS LIVROS */
+
+.capa-livro {
+    width: 100%;
+    max-width: 190px;
+    aspect-ratio: 2 / 3;
+    margin: 0 auto 1rem;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--cor-papel-escuro);
+    box-shadow: 3px 5px 12px rgba(0, 0, 0, 0.18);
+}
+
+.capa-livro img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.card:hover .capa-livro img {
+    transform: scale(1.03);
+}
+
+
+/* 14. TÍTULOS E INFORMAÇÕES DOS LIVROS */
+
+.livro-link {
+    cursor: pointer;
+    color: var(--cor-principal);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    margin-top: 0.3rem;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+}
+
+.livro-link:hover,
+.livro-link:focus-visible {
+    color: var(--cor-destaque);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+
+/* 15. ETIQUETAS DE GÊNERO */
+
+.tag-genero {
+    background: #E9DFC9;
+    color: #493820;
+    padding: 0.3rem 0.65rem;
+    border: 1px solid #D3BE96;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-block;
+    margin-bottom: 0.6rem;
+    font-family: 'Roboto', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+/* 16. CORES ESPECÍFICAS DAS CATEGORIAS */
+
+.tag-computacao {
+    background: var(--cor-computacao);
+    color: #E4C58B;
+}
+
+.tag-direito {
+    background: var(--cor-direito);
+    color: #F1D9C1;
+}
+
+.tag-economia {
+    background: var(--cor-economia);
+    color: #E8D5A8;
+}
+
+.tag-filosofia {
+    background: var(--cor-filosofia);
+    color: #E5D5F0;
+}
+
+.tag-historia {
+    background: var(--cor-historia);
+    color: #FFF0D7;
+}
+
+.tag-letras {
+    background: var(--cor-letras);
+    color: #E2DCC3;
+}
+
+.tag-matematica {
+    background: var(--cor-matematica);
+    color: #E7D9B8;
+}
+
+.tag-poesia {
+    background: var(--cor-poesia);
+    color: #F4D9E4;
+}
+
+.tag-romance {
+    background: var(--cor-romance);
+    color: #E8DCC3;
+}
+
+.tag-teatro {
+    background: var(--cor-teatro);
+    color: #F3D9CE;
+}
+
+
+/* 17. AÇÕES DOS CARDS */
+
+.card-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+
+/* 18. BOTÕES */
 
 .btn {
-    display: inline-block;
-    background: #2563eb;
-    color: #fff;
-    padding: 0.5rem 1rem;
-    border: none;
+    font-family: 'Roboto', sans-serif;
+    background: var(--cor-principal);
+    color: var(--cor-papel);
+    padding: 0.7rem 1.2rem;
+    border: 1px solid var(--cor-principal);
     border-radius: 4px;
     text-decoration: none;
     text-align: center;
-    margin-top: 1rem;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-block;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
 }
 
 .btn:hover {
-    background: #1d4ed8;
+    background: #30394A;
+    border-color: var(--cor-luz);
+    color: var(--cor-luz);
 }
 
-.forum-box input, .forum-box textarea {
-    width: 100%;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border: 1px solid #cbd5e1;
+
+/* Botões menores */
+
+.btn-pequeno {
+    font-family: 'Roboto', sans-serif;
+    background: var(--cor-destaque);
+    color: #17130D;
+    border: 1px solid var(--cor-destaque);
+    padding: 0.55rem 1rem;
     border-radius: 4px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-pequeno:hover {
+    background: #D4B477;
+}
+
+
+/* Botão de detalhes */
+
+.btn-detalhes {
+    font-family: 'Roboto', sans-serif;
+    background: var(--cor-papel-escuro);
+    border: 1px solid var(--cor-borda);
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--cor-principal);
+}
+
+.btn-detalhes:hover {
+    background: #E3D5BE;
+}
+
+
+/* Botão voltar */
+
+.btn-voltar {
+    font-family: 'Roboto', sans-serif;
+    background: none;
+    border: none;
+    color: var(--cor-principal);
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+
+/* 19. CAMPO DE BUSCA */
+
+#input-busca {
+    font-family: 'Roboto', sans-serif;
+    width: 100%;
+    max-width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: 6px;
+    background: #FFFCF6;
+    color: var(--cor-texto);
+}
+
+#input-busca:focus {
+    outline: 2px solid var(--cor-destaque);
+    outline-offset: 2px;
+}
+
+
+/* 20. FORMULÁRIOS */
+
+.form-contato input,
+.form-contato textarea,
+.forum-box input,
+.forum-box textarea,
+.forum-box select {
+    font-family: 'Roboto', sans-serif;
+    width: 100%;
+    max-width: 100%;
+    padding: 0.8rem;
+    margin-top: 0.4rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: 4px;
+    background: #FFFCF6;
+    color: var(--cor-texto);
+    font-size: 1rem;
+}
+
+.form-contato input:focus,
+.form-contato textarea:focus,
+.forum-box input:focus,
+.forum-box textarea:focus,
+.forum-box select:focus {
+    outline: 2px solid var(--cor-destaque);
+    outline-offset: 2px;
+}
+
+/* COMENTÁRIOS * Estilo para a caixa de texto de comentários na página de detalhes */
+.form-comentario textarea {
+    font-family: 'Roboto', sans-serif;
+    width: 100%;
+    max-width: 100%;
+    padding: 0.8rem;
+    margin-top: 0.4rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: 4px;
+    background: #FFFCF6;
+    color: var(--cor-texto);
+    font-size: 1rem;
+    min-height: 150px; /* Garante o espaço visual equivalente a cerca de 7 linhas */
+    resize: vertical;  /* Permite redimensionar se o usuário preferir */
+}
+
+.form-comentario textarea:focus {
+    outline: 2px solid var(--cor-destaque);
+    outline-offset: 2px;
 }
 
 .comment-item {
-    background: #f8fafc;
-    padding: 1rem;
-    border-left: 4px solid #2563eb;
+    background: #F0E7D8;
+    padding: 1.2rem;
+    border-left: 4px solid var(--cor-destaque);
     margin-bottom: 1rem;
     border-radius: 0 4px 4px 0;
+    border-top: 1px solid var(--cor-borda);
+    border-right: 1px solid var(--cor-borda);
+    border-bottom: 1px solid var(--cor-borda);
 }
+
+
+/* 22. RODAPÉ */
 
 footer {
     text-align: center;
-    padding: 1.5rem 0;
-    background: #1e293b;
-    color: #fff;
-    margin-top: 2rem;
+    padding: 2rem 1rem;
+    background: var(--cor-principal);
+    color: var(--cor-texto-claro);
+    margin-top: 3rem;
+    font-size: 0.95rem;
+    border-top: 3px solid var(--cor-luz);
+}
+
+
+/* 23. ACESSIBILIDADE */
+
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--cor-destaque);
+    outline-offset: 3px;
+}
+
+
+/* 24. RESPONSIVIDADE - TABLETS E CELULARES */
+
+@media (max-width: 768px) {
+
+    .header-content {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .user-box {
+        flex-wrap: wrap;
+    }
+
+    .nav-container {
+        gap: 0.8rem 1rem;
+    }
+
+    .layout-acervo {
+        flex-direction: column;
+    }
+
+    .sidebar-generos {
+        flex: auto;
+        width: 100%;
+    }
+
+    .card-grid {
+        grid-template-columns: repeat(
+            auto-fit,
+            minmax(min(100%, 220px), 1fr)
+        );
+    }
+
+    main {
+        padding: 2rem 0;
+    }
+}
+
+
+/* 25. CELULARES PEQUENOS */
+
+@media (max-width: 480px) {
+
+    .container {
+        width: 94%;
+    }
+
+    .nav-container {
+        gap: 0.7rem;
+    }
+
+    .nav-container a {
+        font-size: 0.9rem;
+    }
+
+    .card-acoes {
+        flex-direction: column;
+    }
+
+    .card-acoes .btn,
+    .card-acoes .btn-pequeno,
+    .card-acoes .btn-detalhes {
+        width: 100%;
+    }
+
+    .capa-livro {
+        max-width: 160px;
+    }
+}
+
+
+/* 26. REDUÇÃO DE ANIMAÇÕES */
+
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
 }
