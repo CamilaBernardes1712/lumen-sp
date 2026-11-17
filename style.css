@@ -763,3 +763,46 @@ button:focus-visible {
         animation-duration: 0.01ms !important;
     }
 }
+
+/* Banner dos gêneros */
+.genero-banner-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Ilustração do gênero */
+.genero-capa-img {
+    width: 200px !important;
+    height: 160px !important;
+    object-fit: contain !important;
+    border-radius: 6px;
+    display: block;
+    flex-shrink: 0;
+}
+
+/* Bordas da imagem */
+.genero-capa-img {
+    width: 200px !important;
+    height: auto !important;
+    max-height: none !important;
+
+    object-fit: unset !important;
+    border: none !important;
+    padding: 0 !important;
+
+    border-radius: 12px !important;
+    display: block;
+    flex-shrink: 0;
+}
+
+/* Celulares */
+@media (max-width: 600px) {
+    .genero-capa-img {
+        width: 130px !important;
+    }
+
+    .genero-banner-container {
+        gap: 12px;
+    }
+}

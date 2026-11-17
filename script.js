@@ -34,11 +34,31 @@ let livros = [
     { id: 31, titulo: "Caminhando pela Filologia e Língua Portuguesa", organizador: "Verena Kewitz, Rosane de Sá Amado, Valéria Gil Condé, Zilda Gaspar Oliveira de Aquino e Luiz Antônio da Silva", genero: "Letras", paginas: 309, desc: "O livro Caminhando pela Filologia e Língua Portuguesa reúne quinze capítulos de alunos e um de ex-aluno do Programa de Pós-Graduação em Filologia e Língua Portuguesa da USP. Os textos foram avaliados e aprovados por pareceristas da área, que compõem a Comissão Científica da obra e, em sua maioria, atuaram também como debatedores dos trabalhos apresentados no III Colóquio de Pesquisa Discente, realizado em novembro de 2022. Algumas pesquisas estão em fase inicial, outras mais avançadas ou em conclusão, e todas retratam os caminhos percorridos ou em andamento, em qualquer ponto do percurso científico.", downloads: 0, avaliacaoMedia: 0.0, arquivo: "https://livrosabertos.abcd.usp.br/portaldelivrosUSP/pt_BR/catalog/book/1068", tipoAcao: "externo", comentarios: [] },
     { id: 32, titulo: "A subcriação de mundos: Estudos sobre a literatura de J.R.R. Tolkien", organizador: "Cristina Casagrande, Diego Genu Klautau e Maria Zilda da Cunha", genero: "Letras", paginas: 346, desc: "A subcriação de mundos: estudos sobre a literatura de J. R. R. Tolkien reúne ensaios que apresentam uma diversidade de perspectivas teóricas e abordagens temáticas, desdobradas a partir de um curso de difusão ministrado na FFLCH-USP em 2018. A publicação ganha profundidade com a participação de entusiastas e pesquisadores que trazem reflexões contemporâneas sobre a vida e a obra de John Ronald Reuel Tolkien. As ideias dialogam com os estudos das artes, da filosofia, da ciência da religião, da literatura de recepção juvenil e dos estudos comparados de literatura, entre outros campos do saber. A obra representa um importante esforço investigativo e a promessa de continuidade de diálogos e reflexões.", downloads: 0, avaliacaoMedia: 0.0, arquivo: "https://livrosabertos.abcd.usp.br/portaldelivrosUSP/pt_BR/catalog/book/405", tipoAcao: "externo", comentarios: [] },
     { id: 33, titulo: "Elementos principais da Geometria Descritiva", autor: "Alexandre Kawano e João Petreche", genero: "Matemática", paginas: 62, desc: "Este livro apresenta os fundamentos da Geometria Descritiva, ferramenta gráfica para a solução de problemas geométricos no espaço, cujo objetivo é representar objetos tridimensionais em planos bidimensionais por meio de projeções ortogonais de elementos como pontos e retas. Com base em um conjunto de princípios que definem a forma e a posição desses objetos, a técnica permite a profissionais visualizar e analisar peças complexas, facilitando o processo de projeto, construção e fabricação. Segundo a experiência dos autores, o tema é de fácil leitura, mas de difícil aprendizado, e a melhor forma de dominá-lo é resolvendo exercícios.", downloads: 0, avaliacaoMedia: 0.0, arquivo: "https://livrosabertos.abcd.usp.br/portaldelivrosUSP/pt_BR/catalog/book/1078", tipoAcao: "externo", comentarios: [] },
-    { id: 34, titulo: "Áreas: teoria, construções e problemas", autor: "Juan López Linares", genero: "Matemática", paginas: 95, desc: "Este livro trata do cálculo de áreas, conceito fundamental na matemática, na ciência, na engenharia, na arquitetura, na geografia e em muitas outras disciplinas. Além da Introdução, organiza-se em três capítulos: fundamentos para cálculos de áreas; construções, exercícios e desafios; e problemas de olimpíadas internacionais. Suas 54 figuras trazem links para gráficos interativos no GeoGebra e, em vários casos, para resoluções em vídeo no YouTube. O software, gratuito e disponível online e em aplicativos, permite construções dinâmicas que exploram diversas configurações de um mesmo problema. Serve tanto para verificação, como calculadora gráfica e numérica, quanto para apresentar, passo a passo, demonstrações rigorosas, convidando o leitor a interagir. O material foi utilizado no curso “Geometria Olímpica com GeoGebra”, destinado a professores de Matemática do Ensino Fundamental e Médio de todo o Brasil.", downloads: 0, avaliacaoMedia: 0.0, arquivo: "https://livrosabertos.abcd.usp.br/portaldelivrosUSP/pt_BR/catalog/book/1291", tipoAcao: "externo", comentarios: [] }
+    { id: 34, titulo: "Áreas: teoria, construções e problemas", autor: "Juan López Linares", genero: "Matemática", paginas: 95, desc: "Este livro trata do cálculo de áreas, conceito fundamental na matemática, na ciência, na engenharia, na arquitetura, na geografia e em muitas outras disciplinas. Além da Introdução, organiza-se em três capítulos: fundamentos para cálculos de áreas; construções, exercícios e desafios; e problemas de olimpíadas internacionais. Suas 54 figuras trazem links para gráficos interativos no GeoGebra e, em vários casos, para resoluções em vídeo no YouTube. O software, gratuito e disponível online e em aplicativos, permite construções dinâmicas que exploram diversas configurações de um mesmo problema. Serve tanto para verificação, como calculadora gráfica e numérica, quanto para apresentar, passo a passo, demonstrações rigorosas, convidando o leitor a interagir. O material foi utilizado no curso “Geometria Olímpica com GeoGebra”, destinado a professores de Matemática do Ensino Fundamental e Médio de todo o Brasil.", downloads: 0, avaliacaoMedia: 0.0, arquivo: "https://livrosabertos.abcd.usp.br/portaldelivrosUSP/pt_BR/catalog/book/1291", tipoAcao: "externo", comentarios: [] },
 ];
 
 let usuarioLogado = null;
 let topicosForum = [];
+
+// Identifica se o Lumen SP está aberto como aplicativo
+const MODO_PWA =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+
+// Chave utilizada para armazenar a última navegação
+const CHAVE_ESTADO = 'lumenSP_estado_navegacao';
+
+// Informações da última página visitada
+let estadoNavegacao = {
+    secao: 'inicio',
+    genero: 'todos',
+    busca: '',
+    livroId: null,
+    scrollY: 0
+};
+
+let restaurandoEstado = false;
+let temporizadorScroll = null;
 
 function fazerLogin() {
     const nome = document.getElementById('login-nome').value;
@@ -51,23 +71,196 @@ function fazerLogin() {
     }
 }
 
+// Salva o estado atual da navegação no aplicativo
+function salvarEstadoNavegacao() {
+    if (!MODO_PWA || restaurandoEstado) return;
+
+    try {
+        estadoNavegacao.scrollY = window.scrollY;
+
+        localStorage.setItem(
+            CHAVE_ESTADO,
+            JSON.stringify(estadoNavegacao)
+        );
+    } catch (erro) {
+        console.warn('Não foi possível salvar a navegação:', erro);
+    }
+}
+
+
+// Recupera a última navegação do usuário no aplicativo
+function restaurarEstadoNavegacao() {
+    // No computador, continua abrindo a página inicial
+    if (!MODO_PWA) {
+        mudarSecao('inicio');
+        return;
+    }
+
+    let estadoSalvo;
+
+    try {
+        estadoSalvo = JSON.parse(
+            localStorage.getItem(CHAVE_ESTADO)
+        );
+    } catch (erro) {
+        console.warn('Não foi possível recuperar a navegação:', erro);
+    }
+
+    // Se não houver navegação salva, abre a página inicial
+    if (!estadoSalvo) {
+        mudarSecao('inicio');
+        return;
+    }
+
+    const secoesPermitidas = [
+        'inicio',
+        'acervo',
+        'detalhes',
+        'em-alta',
+        'forum',
+        'contato'
+    ];
+
+    if (!secoesPermitidas.includes(estadoSalvo.secao)) {
+        mudarSecao('inicio');
+        return;
+    }
+
+    restaurandoEstado = true;
+
+    estadoNavegacao = {
+        ...estadoNavegacao,
+        ...estadoSalvo
+    };
+
+    // Recupera o acervo, a categoria ou a pesquisa
+    if (estadoSalvo.secao === 'acervo') {
+        const campoBusca = document.getElementById('input-busca');
+
+        if (campoBusca) {
+            campoBusca.value = estadoSalvo.busca || '';
+        }
+
+        if (estadoSalvo.busca) {
+            buscarLivros();
+        } else {
+            filtrarCategoria(estadoSalvo.genero || 'todos');
+        }
+    }
+
+    // Recupera os detalhes do último livro consultado
+    else if (estadoSalvo.secao === 'detalhes') {
+        const livroExiste = livros.some(
+            livro => livro.id === Number(estadoSalvo.livroId)
+        );
+
+        if (livroExiste) {
+            abrirDetalhes(Number(estadoSalvo.livroId));
+        } else {
+            mudarSecao('inicio');
+        }
+    }
+
+    // Recupera as demais seções
+    else {
+        mudarSecao(estadoSalvo.secao);
+    }
+
+    // Recupera a posição da página
+    requestAnimationFrame(() => {
+        window.scrollTo(0, Number(estadoSalvo.scrollY) || 0);
+
+        restaurandoEstado = false;
+        salvarEstadoNavegacao();
+    });
+}
+
+
+// Salva a posição de rolagem enquanto o usuário navega
+window.addEventListener('scroll', () => {
+    if (!MODO_PWA || restaurandoEstado) return;
+
+    clearTimeout(temporizadorScroll);
+
+    temporizadorScroll = setTimeout(() => {
+        salvarEstadoNavegacao();
+    }, 300);
+});
+
+
+// Salva o estado quando o aplicativo vai para segundo plano
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+        salvarEstadoNavegacao();
+    }
+});
+
+// Salva o estado quando a página está sendo encerrada
+window.addEventListener('pagehide', salvarEstadoNavegacao);
+
 function mudarSecao(secaoId) {
     const secoes = ['inicio', 'acervo', 'detalhes', 'em-alta', 'forum', 'contato'];
+
     secoes.forEach(s => {
         const el = document.getElementById(`sec-${s}`);
-        if(el) el.style.display = 'none';
+        if (el) el.style.display = 'none';
     });
-    
-    const secaoAtiva = document.getElementById(`sec-${secaoId}`);
-    if(secaoAtiva) secaoAtiva.style.display = 'block';
 
-    if(secaoId === 'acervo') filtrarCategoria('todos');
-    if(secaoId === 'em-alta') renderizarEmAlta();
+    const secaoAtiva = document.getElementById(`sec-${secaoId}`);
+    if (secaoAtiva) secaoAtiva.style.display = 'block';
+
+    if (secaoId === 'acervo') {
+        filtrarCategoria('todos');
+        return;
+    }
+
+    if (secaoId === 'em-alta') {
+        renderizarEmAlta();
+    }
+
+    estadoNavegacao.secao = secaoId;
+
+    if (secaoId !== 'detalhes') {
+        estadoNavegacao.livroId = null;
+    }
+
+    salvarEstadoNavegacao();
 }
 
 function exibirLivros(lista, titulo = "Todos os Livros do Acervo") {
     const tituloEl = document.getElementById('titulo-categoria');
-    if(tituloEl) tituloEl.innerText = titulo;
+    if(tituloEl) {
+        // Converte o título para verificar se é um gênero que possui capa
+        const arquivoImg = titulo
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, '-');
+
+        const generosComCapa = [
+            'ciencia-da-computacao',
+            'economia',
+            'direito',
+            'filosofia',
+            'historia',
+            'letras'
+        ];
+
+        if (generosComCapa.includes(arquivoImg)) {
+            tituloEl.innerHTML = `
+                <div class="genero-banner-container">
+                    <img
+                        src="assets/generos/${arquivoImg}.png"
+                        alt=""
+                        class="genero-capa-img"
+                    >
+                    <span>${titulo}</span>
+                </div>
+            `;
+        } else {
+            tituloEl.innerText = titulo;
+        }
+    }
     
     const grid = document.getElementById('grid-livros');
     if(!grid) return;
@@ -82,7 +275,6 @@ function exibirLivros(lista, titulo = "Todos os Livros do Acervo") {
         const card = document.createElement('div');
         card.classList.add('card');
         
-        // Verifica se exibe "Organizador" ou "Autor"
         let responsavelTexto = livro.organizador 
             ? `<p><strong>Organizador:</strong> ${livro.organizador}</p>` 
             : `<p><strong>Autor:</strong> ${livro.autor}</p>`;
@@ -114,36 +306,80 @@ function exibirLivros(lista, titulo = "Todos os Livros do Acervo") {
 
 function filtrarCategoria(genero) {
     const secoes = ['inicio', 'detalhes', 'em-alta', 'forum', 'contato'];
+
     secoes.forEach(s => {
         const el = document.getElementById(`sec-${s}`);
-        if(el) el.style.display = 'none';
+        if (el) el.style.display = 'none';
     });
-    
-    const secaoAcervo = document.getElementById('sec-acervo');
-    if(secaoAcervo) secaoAcervo.style.display = 'block';
 
-    if(genero === 'todos') {
+    const secaoAcervo = document.getElementById('sec-acervo');
+    if (secaoAcervo) secaoAcervo.style.display = 'block';
+
+    estadoNavegacao.secao = 'acervo';
+    estadoNavegacao.genero = genero;
+    estadoNavegacao.busca = '';
+    estadoNavegacao.livroId = null;
+
+    if (genero === 'todos' || genero === 'Todos os Livros') {
         exibirLivros(livros, "Todos os Livros do Acervo");
     } else {
         const filtrados = livros.filter(l => l.genero === genero);
-        exibirLivros(filtrados, `${genero}`);
+        exibirLivros(filtrados, genero);
     }
+
+    salvarEstadoNavegacao();
+}
+
+// Apresenta resultados buscando por palavras com ou sem acento
+function normalizarTexto(texto) {
+    return (texto || '')
+        .toString()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
 }
 
 function buscarLivros() {
-    const termo = document.getElementById('input-busca').value.toLowerCase();
-    const filtrados = livros.filter(l => 
-        l.titulo.toLowerCase().includes(termo) || 
-        l.autor.toLowerCase().includes(termo) ||
-        l.genero.toLowerCase().includes(termo)
+    const campoBusca = document.getElementById('input-busca');
+    const buscaOriginal = campoBusca ? campoBusca.value.trim() : '';
+
+    const termo = normalizarTexto(buscaOriginal);
+
+    const filtrados = livros.filter(livro => {
+        const titulo = normalizarTexto(livro.titulo);
+        const autor = normalizarTexto(livro.autor);
+        const organizador = normalizarTexto(livro.organizador);
+        const genero = normalizarTexto(livro.genero);
+        const descricao = normalizarTexto(livro.desc);
+
+        return (
+            titulo.includes(termo) ||
+            autor.includes(termo) ||
+            organizador.includes(termo) ||
+            genero.includes(termo) ||
+            descricao.includes(termo)
+        );
+    });
+
+    exibirLivros(filtrados, termo
+        ? "Resultados da Busca"
+        : "Todos os Livros do Acervo"
     );
-    exibirLivros(filtrados, "Resultados da Busca");
+
+    estadoNavegacao.secao = 'acervo';
+    estadoNavegacao.busca = buscaOriginal;
+    estadoNavegacao.genero = 'todos';
+    estadoNavegacao.livroId = null;
+
+    salvarEstadoNavegacao();
 }
 
 function abrirDetalhes(id) {
     const livro = livros.find(l => l.id === id);
     const box = document.getElementById('detalhe-livro-conteudo');
-    if(!box) return;
+
+    if (!livro || !box) return;
     
     let responsavelDetalhe = livro.organizador 
         ? `<p><strong>Organizador:</strong> ${livro.organizador}</p>` 
@@ -203,6 +439,11 @@ function abrirDetalhes(id) {
         </div>
     `;
     mudarSecao('detalhes');
+
+    estadoNavegacao.secao = 'detalhes';
+    estadoNavegacao.livroId = id;
+
+    salvarEstadoNavegacao();
 }
 
 function registrarDownload(id) {
@@ -317,7 +558,5 @@ function renderizarForum() {
     });
 }
 
-// Ao carregar o site,abre na página inicial
-window.onload = () => {
-    mudarSecao('inicio');
-};
+// Ao carregar, restaura a navegação no PWA
+window.addEventListener('load', restaurarEstadoNavegacao);
