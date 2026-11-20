@@ -575,24 +575,28 @@ function renderizarForum() {
 window.addEventListener('load', restaurarEstadoNavegacao);
 
 // Fecha o menu dropdown ao selecionar um gênero literário
-document.querySelectorAll('.dropdown-content a, .dropdown > a').forEach(link => {
+document.querySelectorAll('.dropdown-content a').forEach(link => {
     link.addEventListener('click', function () {
         const dropdown = this.closest('.dropdown');
         if (dropdown) {
             dropdown.classList.add('fechado');
-            this.blur(); // Remove o foco do link para liberar o :focus-within
+            this.blur();
         }
     });
 });
 
-// Libera o menu novamente quando o mouse sai da área do dropdown
 const menuDropdown = document.querySelector('.dropdown');
+
+// No computador, libera ao tirar o mouse da área do menu
 if (menuDropdown) {
     menuDropdown.addEventListener('mouseleave', function () {
         this.classList.remove('fechado');
     });
-
-    menuDropdown.addEventListener('touchstart', function () {
-        this.classList.remove('fechado');
-    });
 }
+
+// No celular, libera quando o usuário toca fora do menu
+document.addEventListener('touchstart', function (event) {
+    if (menuDropdown && !menuDropdown.contains(event.target)) {
+        menuDropdown.classList.remove('fechado');
+    }
+});
