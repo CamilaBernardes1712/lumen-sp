@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#111827">
+
+    <title>Sem conexão | Lumen SP</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            background: #111827;
+            color: #f4f1ea;
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+        }
+
+        .offline-container {
+            max-width: 520px;
+            padding: 45px 30px;
+            border: 1px solid rgba(214, 168, 90, 0.4);
+            border-radius: 14px;
+            background: #1e293b;
+        }
+
+        .lamp {
+            font-size: 48px;
+            margin-bottom: 22px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #d6a85a;
+            margin-bottom: 18px;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+            margin-bottom: 25px;
+        }
+
+        button {
+            padding: 13px 24px;
+            border: 1px solid #d6a85a;
+            border-radius: 6px;
+            background: transparent;
+            color: #d6a85a;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #d6a85a;
+            color: #111827;
+        }
+
+        .slogan {
+            margin-top: 30px;
+            font-family: 'Playfair Display', serif;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="offline-container">
+
+        <div class="lamp" aria-hidden="true">🕯️</div>
+
+        <h1>Um momento de pausa...</h1>
+
+        <p>
+            Parece que você está sem conexão com a internet.
+            Mas não se preocupe: os conteúdos já armazenados
+            no seu dispositivo continuam disponíveis.
+        </p>
+
+        <button onclick="window.location.reload()">
+            Tentar novamente
+        </button>
+
+        <div class="slogan">
+            Conhecimento que conecta, leitura que transforma.
+        </div>
+
+    </main>
+
+</body>
+</html>

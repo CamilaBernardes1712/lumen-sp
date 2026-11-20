@@ -243,7 +243,11 @@ function exibirLivros(lista, titulo = "Todos os Livros do Acervo") {
             'direito',
             'filosofia',
             'historia',
-            'letras'
+            'letras',
+            'matematica',
+            'romance',
+            'teatro',
+            'poesia'
         ];
 
         if (generosComCapa.includes(arquivoImg)) {
