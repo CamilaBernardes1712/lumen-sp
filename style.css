@@ -231,8 +231,8 @@ header {
     color: var(--cor-luz);
 }
 
-.dropdown:hover .dropdown-content,
-.dropdown:focus-within .dropdown-content {
+.dropdown:hover:not(.fechado) .dropdown-content,
+.dropdown:focus-within:not(.fechado) .dropdown-content {
     display: block;
 }
 
@@ -768,41 +768,26 @@ button:focus-visible {
 .genero-banner-container {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 24px;
+    margin-bottom: 10px;
 }
 
-/* Ilustração do gênero */
+/* Imagem do gênero (Computador) */
 .genero-capa-img {
-    width: 200px !important;
-    height: 160px !important;
-    object-fit: contain !important;
-    border-radius: 6px;
-    display: block;
-    flex-shrink: 0;
-}
-
-/* Bordas da imagem */
-.genero-capa-img {
-    width: 200px !important;
+    width: 280px !important; /* Aumentado de 200px para 280px (pode testar entre 260px e 320px) */
     height: auto !important;
-    max-height: none !important;
-
-    object-fit: unset !important;
-    border: none !important;
-    padding: 0 !important;
-
     border-radius: 12px !important;
     display: block;
     flex-shrink: 0;
 }
 
-/* Celulares */
+/* Imagem do gênero (Celular) */
 @media (max-width: 600px) {
     .genero-capa-img {
-        width: 130px !important;
+        width: 170px !important; /* Aumentado de 130px para 170px */
     }
 
     .genero-banner-container {
-        gap: 12px;
+        gap: 14px;
     }
 }

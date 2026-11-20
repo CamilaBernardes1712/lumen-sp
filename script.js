@@ -564,3 +564,26 @@ function renderizarForum() {
 
 // Ao carregar, restaura a navegação no PWA
 window.addEventListener('load', restaurarEstadoNavegacao);
+
+// Fecha o menu dropdown ao selecionar um gênero literário
+document.querySelectorAll('.dropdown-content a, .dropdown > a').forEach(link => {
+    link.addEventListener('click', function () {
+        const dropdown = this.closest('.dropdown');
+        if (dropdown) {
+            dropdown.classList.add('fechado');
+            this.blur(); // Remove o foco do link para liberar o :focus-within
+        }
+    });
+});
+
+// Libera o menu novamente quando o mouse sai da área do dropdown
+const menuDropdown = document.querySelector('.dropdown');
+if (menuDropdown) {
+    menuDropdown.addEventListener('mouseleave', function () {
+        this.classList.remove('fechado');
+    });
+
+    menuDropdown.addEventListener('touchstart', function () {
+        this.classList.remove('fechado');
+    });
+}
