@@ -309,6 +309,7 @@ function exibirLivros(lista, titulo = "Todos os Livros do Acervo") {
 }
 
 function filtrarCategoria(genero) {
+    const posicaoScrollAtual = window.scrollY;
     const secoes = ['inicio', 'detalhes', 'em-alta', 'forum', 'contato'];
 
     secoes.forEach(s => {
@@ -330,6 +331,14 @@ function filtrarCategoria(genero) {
         const filtrados = livros.filter(l => l.genero === genero);
         exibirLivros(filtrados, genero);
     }
+
+    // Mantém a posição da tela estável após atualizar a grade de livros
+    requestAnimationFrame(() => {
+        window.scrollTo({
+            top: posicaoScrollAtual,
+            behavior: 'instant'
+        });
+    });
 
     salvarEstadoNavegacao();
 }
