@@ -231,11 +231,17 @@ header {
     color: var(--cor-luz);
 }
 
-.dropdown:hover:not(.fechado) .dropdown-content,
-.dropdown:focus-within:not(.fechado) .dropdown-content {
+/* Abre ao clicar/tocar (classe controlada pelo JS) */
+.dropdown.aberto .dropdown-content {
     display: block;
 }
 
+/* Abre ao passar o mouse APENAS em computadores com cursor real */
+@media (hover: hover) and (pointer: fine) {
+    .dropdown:hover:not(.fechado) .dropdown-content {
+        display: block;
+    }
+}
 
 /* 8. CONTEÚDO PRINCIPAL */
 

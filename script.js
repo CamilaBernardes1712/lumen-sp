@@ -586,17 +586,35 @@ document.querySelectorAll('.dropdown-content a').forEach(link => {
 });
 
 const menuDropdown = document.querySelector('.dropdown');
+const botaoDropdown = document.querySelector('.dropdown > a');
 
-// No computador, libera ao tirar o mouse da área do menu
-if (menuDropdown) {
+if (menuDropdown && botaoDropdown) {
+    // Alterna abertura/fechamento ao clicar ou tocar em "Acervo Digital ▼"
+    botaoDropdown.addEventListener('click', function (e) {
+        e.preventDefault();
+        menuDropdown.classList.remove('fechado');
+        menuDropdown.classList.toggle('aberto');
+    });
+
+    // Fecha imediatamente ao escolher qualquer gênero da lista
+    menuDropdown.querySelectorAll('.dropdown-content a').forEach(link => {
+        link.addEventListener('click', function () {
+            menuDropdown.classList.remove('aberto');
+            menuDropdown.classList.add('fechado');
+            this.blur();
+        });
+    });
+
+    // No computador, libera o hover quando o mouse sai do menu
     menuDropdown.addEventListener('mouseleave', function () {
         this.classList.remove('fechado');
+        this.classList.remove('aberto');
     });
 }
 
-// No celular, libera quando o usuário toca fora do menu
-document.addEventListener('touchstart', function (event) {
+// Fecha o menu se o usuário tocar ou clicar fora dele
+document.addEventListener('click', function (event) {
     if (menuDropdown && !menuDropdown.contains(event.target)) {
-        menuDropdown.classList.remove('fechado');
+        menuDropdown.classList.remove('aberto');
     }
 });
