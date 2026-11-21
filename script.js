@@ -680,3 +680,45 @@ document.addEventListener('click', function (event) {
         menuDropdown.classList.remove('aberto');
     }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('modal-boas-vindas');
+  const btnEntrar = document.getElementById('btn-entrar-biblioteca');
+  const btnFecharX = document.getElementById('fechar-modal-x');
+  const checkboxNaoMostrar = document.getElementById('nao-mostrar-novamente');
+
+  if (!modal) return;
+
+  const CHAVE_STORAGE = 'lumen_sp_ocultar_boas_vindas';
+  const jaOcultou = localStorage.getItem(CHAVE_STORAGE) === 'true';
+
+  // Verifica se o usuário já está rodando o PWA instalado na tela inicial
+  const emModoApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+  // Exibe a mensagem apenas se não tiver marcado a opção e não estiver no app instalado
+  if (!jaOcultou && !emModoApp) {
+    // Pequeno atraso de 600ms para a página carregar suavemente antes de abrir o aviso
+    setTimeout(() => {
+      modal.classList.add('ativo');
+      modal.setAttribute('aria-hidden', 'false');
+    }, 600);
+  }
+
+  function fecharModal() {
+    if (checkboxNaoMostrar && checkboxNaoMostrar.checked) {
+      localStorage.setItem(CHAVE_STORAGE, 'true');
+    }
+    modal.classList.remove('ativo');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+
+  btnEntrar.addEventListener('click', fecharModal);
+  btnFecharX.addEventListener('click', fecharModal);
+
+  // Permite fechar clicando fora da caixa 
+  modal.addEventListener('click', (evento) => {
+    if (evento.target === modal) {
+      fecharModal();
+    }
+  });
+});

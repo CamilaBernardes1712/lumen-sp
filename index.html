@@ -184,5 +184,41 @@
           .catch((error) => console.log("Falha ao registrar Service Worker:", error));
       }
     </script>
+
+    <!-- Mensagem de Boas-Vindas - Lumen SP -->
+<div id="modal-boas-vindas" class="modal-lumen-overlay" aria-hidden="true">
+  <div class="modal-lumen-card" role="dialog" aria-labelledby="titulo-boas-vindas">
+    <button type="button" id="fechar-modal-x" class="modal-lumen-close" aria-label="Fechar aviso">&times;</button>
+    
+    <div class="modal-lumen-cabecalho">
+      <span class="modal-lumen-selo">Acervo Digital • Lumen SP</span>
+      <h2 id="titulo-boas-vindas">As portas da biblioteca estão abertas📖</h2>
+    </div>
+
+    <div class="modal-lumen-corpo">
+      <p>
+        Sinta-se à vontade entre nossas estantes digitais. Aqui, o conhecimento é livre, gratuito e pensado para acompanhar sua jornada acadêmica e literária. ✨
+      </p>
+      
+      <div class="modal-lumen-dica-pwa">
+        <strong>Leve a biblioteca no bolso:</strong>
+        <p>
+          Você pode instalar o aplicativo da <strong>Lumen SP</strong> no seu dispositivo. Basta tocar nos <strong>três pontinhos (⋮)</strong> no canto superior do navegador e selecionar <em>"Instalar aplicativo"</em> ou <em>"Adicionar à tela inicial / Criar atalho"</em>.
+        </p>
+      </div>
+    </div>
+
+    <div class="modal-lumen-rodape">
+      <label class="modal-lumen-checkbox">
+        <input type="checkbox" id="nao-mostrar-novamente">
+        <span>Não mostrar este aviso novamente</span>
+      </label>
+
+      <button type="button" id="btn-entrar-biblioteca" class="modal-lumen-btn">
+        Entendi, explorar o acervo
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
