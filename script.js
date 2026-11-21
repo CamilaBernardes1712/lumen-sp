@@ -57,6 +57,43 @@ let estadoNavegacao = {
     scrollY: 0
 };
 
+const CHAVE_DOWNLOADS = 'lumenSP_downloads_livros';
+
+function salvarDownloads() {
+    try {
+        const mapaDownloads = {};
+        livros.forEach(livro => {
+            if (livro.tipoAcao !== 'externo') {
+                mapaDownloads[livro.id] = Number(livro.downloads) || 0;
+            }
+        });
+        localStorage.setItem(CHAVE_DOWNLOADS, JSON.stringify(mapaDownloads));
+    } catch (erro) {
+        console.warn('Não foi possível salvar os downloads:', erro);
+    }
+}
+
+function carregarDownloadsSalvos() {
+    try {
+        const salvo = JSON.parse(localStorage.getItem(CHAVE_DOWNLOADS));
+        if (!salvo || typeof salvo !== 'object') return;
+
+        livros.forEach(livro => {
+            if (
+                livro.tipoAcao !== 'externo' &&
+                Object.prototype.hasOwnProperty.call(salvo, livro.id)
+            ) {
+                livro.downloads = Number(salvo[livro.id]) || 0;
+            }
+        });
+    } catch (erro) {
+        console.warn('Não foi possível carregar os downloads salvos:', erro);
+    }
+}
+
+// Aplica os downloads salvos assim que o script é lido
+carregarDownloadsSalvos();
+
 let restaurandoEstado = false;
 let temporizadorScroll = null;
 
@@ -162,8 +199,11 @@ function restaurarEstadoNavegacao() {
     }
 
     // Recupera as demais seções
-    else {
+else {
         mudarSecao(estadoSalvo.secao);
+        if (estadoSalvo.secao === 'em-alta') {
+            renderizarEmAlta();
+        }
     }
 
     // Recupera a posição da página
@@ -469,8 +509,15 @@ function abrirDetalhes(id) {
 
 function registrarDownload(id) {
     const livro = livros.find(l => l.id === id);
-    if(livro && livro.tipoAcao !== 'externo') {
-        livro.downloads++;
+    if (livro && livro.tipoAcao !== 'externo') {
+        livro.downloads = (Number(livro.downloads) || 0) + 1;
+        salvarDownloads();
+
+        // Se a seção "Em Alta" estiver visível no momento, já atualiza a grade
+        const secEmAlta = document.getElementById('sec-em-alta');
+        if (secEmAlta && secEmAlta.style.display !== 'none') {
+            renderizarEmAlta();
+        }
     }
 }
 
@@ -503,7 +550,14 @@ function renderizarEmAlta() {
     if(!grid) return;
     grid.innerHTML = '';
     
-    const ordenados = [...livros].sort((a, b) => b.downloads - a.downloads);
+    const ordenados = [...livros]
+        .filter(livro => livro.tipoAcao !== 'externo' && Number(livro.downloads) > 0)
+        .sort((a, b) => b.downloads - a.downloads);
+
+    if (ordenados.length === 0) {
+        grid.innerHTML = '<p>Nenhum livro foi baixado ainda. Clique em "Ler/Baixar PDF" em alguma obra do acervo para vê-la aparecer aqui!</p>';
+        return;
+    }
 
     ordenados.forEach(livro => {
         const card = document.createElement('div');
