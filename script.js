@@ -229,15 +229,23 @@ function mudarSecao(secaoId) {
 
 function exibirLivros(lista, titulo = "Todos os Livros do Acervo") {
     const tituloEl = document.getElementById('titulo-categoria');
-    if(tituloEl) {
-        // Converte o título para verificar se é um gênero que possui capa
-        const arquivoImg = titulo
+    if (tituloEl) {
+        let arquivoImg = titulo
             .toLowerCase()
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, "")
             .replace(/\s+/g, '-');
+       
+        if (
+            arquivoImg === 'todos-os-livros' ||
+            arquivoImg === 'todos-os-livros-do-acervo' ||
+            arquivoImg === 'todososlivros'
+        ) {
+            arquivoImg = 'todososlivros';
+        }
 
         const generosComCapa = [
+            'todososlivros',
             'ciencia-da-computacao',
             'economia',
             'direito',
@@ -255,7 +263,7 @@ function exibirLivros(lista, titulo = "Todos os Livros do Acervo") {
                 <div class="genero-banner-container">
                     <img
                         src="assets/generos/${arquivoImg}.png"
-                        alt=""
+                        alt="${titulo}"
                         class="genero-capa-img"
                     >
                     <span>${titulo}</span>
@@ -265,12 +273,12 @@ function exibirLivros(lista, titulo = "Todos os Livros do Acervo") {
             tituloEl.innerText = titulo;
         }
     }
-    
+
     const grid = document.getElementById('grid-livros');
-    if(!grid) return;
+    if (!grid) return;
     grid.innerHTML = '';
-    
-    if(lista.length === 0) {
+
+    if (lista.length === 0) {
         grid.innerHTML = '<p>Nenhum livro encontrado nesta categoria.</p>';
         return;
     }
@@ -278,17 +286,17 @@ function exibirLivros(lista, titulo = "Todos os Livros do Acervo") {
     lista.forEach(livro => {
         const card = document.createElement('div');
         card.classList.add('card');
-        
-        let responsavelTexto = livro.organizador 
-            ? `<p><strong>Organizador:</strong> ${livro.organizador}</p>` 
+
+        let responsavelTexto = livro.organizador
+            ? `<p><strong>Organizador:</strong> ${livro.organizador}</p>`
             : `<p><strong>Autor:</strong> ${livro.autor}</p>`;
 
-        let botaoAcao = livro.tipoAcao === 'externo' 
+        let botaoAcao = livro.tipoAcao === 'externo'
             ? `<a href="${livro.arquivo}" class="btn" target="_blank">Acessar no Portal</a>`
             : `<a href="${livro.arquivo}" class="btn" onclick="registrarDownload(${livro.id})" target="_blank">Ler/Baixar PDF</a>`;
 
-        let infoDownloads = livro.tipoAcao === 'externo' 
-            ? '' 
+        let infoDownloads = livro.tipoAcao === 'externo'
+            ? ''
             : `<p><strong>Downloads:</strong> 📥 ${livro.downloads}</p>`;
 
         card.innerHTML = `
