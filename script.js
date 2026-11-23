@@ -1,4 +1,25 @@
-// Base de dados simulada para o acervo (com contagem de downloads e avaliações)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    where
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCA1-wp7gunQ1EXTuj01uNZmoWy2O3GcJU",
+  authDomain: "lumen-sp.firebaseapp.com",
+  projectId: "lumen-sp",
+  storageBucket: "lumen-sp.firebasestorage.app",
+  messagingSenderId: "761686344120",
+  appId: "1:761686344120:web:ef1617c3400aba10d24f4d",
+  measurementId: "G-YEXTQJ8RFT"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 let livros = [
     { id: 1, titulo: "A Inteligência Artificial nas Ciências de Dados", organizador: "Luciane Ferreira Alcoforado, João Paulo Marins dos Santos, Orlando Celso Longo, Ariel Levy, Juan López Linares, Jessica Kubrusly", genero: "Ciência da Computação", paginas: 196, desc: "Este livro apresenta técnicas e algoritmos de Inteligência Artificial aplicados à Ciência de Dados, com foco em análise, predição e automação. A IA é destacada como uma ferramenta capaz de processar grandes volumes de dados com rapidez e precisão, acelerando descobertas em diversas áreas do conhecimento. A obra reúne seis capítulos escritos por sete autores de instituições de renome, que exploram temas variados em torno do assunto central. É especialmente indicada para quem deseja começar a usar IA em programação, sobretudo com a linguagem R.", downloads: 0, avaliacaoMedia: 0.0, arquivo: "https://www.livrosabertos.abcd.usp.br/portaldelivrosUSP/catalog/book/1492", tipoAcao: "externo", comentarios: [] },
@@ -58,6 +79,7 @@ let estadoNavegacao = {
 };
 
 const CHAVE_DOWNLOADS = 'lumenSP_downloads_livros';
+const CHAVE_USUARIO = 'lumenSP_usuario_logado';
 
 function salvarDownloads() {
     try {
@@ -91,22 +113,62 @@ function carregarDownloadsSalvos() {
     }
 }
 
-// Aplica os downloads salvos assim que o script é lido
-carregarDownloadsSalvos();
+function renderizarAreaUsuario() {
+    const userArea = document.getElementById('user-area');
+    if (!userArea) return;
 
-let restaurandoEstado = false;
-let temporizadorScroll = null;
+    if (usuarioLogado && usuarioLogado.nome && usuarioLogado.email) {
+        userArea.innerHTML = `
+            <span>Olá, <strong>${usuarioLogado.nome}</strong>!</span>
+            <button type="button" onclick="sairConta()" class="btn-pequeno">Sair</button>
+        `;
+    } else {
+        userArea.innerHTML = `
+            <input type="text" id="login-nome" placeholder="Seu nome" style="width: 200px !important; padding: 0.6rem 0.8rem !important; background: #FFFCF6 !important; border: 1px solid var(--cor-borda) !important; border-radius: 4px !important; font-size: 0.95rem !important; color: var(--cor-texto) !important; outline: none;">
+            <input type="email" id="login-email" placeholder="Seu e-mail" style="width: 200px !important; padding: 0.6rem 0.8rem !important; background: #FFFCF6 !important; border: 1px solid var(--cor-borda) !important; border-radius: 4px !important; font-size: 0.95rem !important; color: var(--cor-texto) !important; outline: none;">
+            <button type="button" onclick="fazerLogin()" class="btn-pequeno" style="margin-left: 0.2rem;">Entrar</button>
+        `;
+    }
+}
+
+function carregarUsuarioSalvo() {
+    try {
+        const salvo = JSON.parse(localStorage.getItem(CHAVE_USUARIO));
+        if (salvo && salvo.nome && salvo.email) {
+            usuarioLogado = salvo;
+        }
+    } catch (erro) {
+        console.warn('Não foi possível recuperar o usuário salvo:', erro);
+    }
+    renderizarAreaUsuario();
+}
 
 function fazerLogin() {
-    const nome = document.getElementById('login-nome').value;
-    const email = document.getElementById('login-email').value;
-    if(nome && email) {
+    const nomeInput = document.getElementById('login-nome');
+    const emailInput = document.getElementById('login-email');
+    const nome = nomeInput ? nomeInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+
+    if (nome && email) {
         usuarioLogado = { nome, email };
-        document.getElementById('user-area').innerHTML = `<span>Olá, ${nome}!</span>`;
+        localStorage.setItem(CHAVE_USUARIO, JSON.stringify(usuarioLogado));
+        renderizarAreaUsuario();
     } else {
         alert('Por favor, informe seu nome e e-mail para entrar.');
     }
 }
+
+function sairConta() {
+    usuarioLogado = null;
+    localStorage.removeItem(CHAVE_USUARIO);
+    renderizarAreaUsuario();
+}
+
+carregarDownloadsSalvos();
+carregarUsuarioSalvo();
+
+let restaurandoEstado = false;
+let temporizadorScroll = null;
 
 // Salva o estado atual da navegação no aplicativo
 function salvarEstadoNavegacao() {
@@ -124,10 +186,8 @@ function salvarEstadoNavegacao() {
     }
 }
 
-
 // Recupera a última navegação do usuário no aplicativo
 function restaurarEstadoNavegacao() {
-    // No computador, continua abrindo a página inicial
     if (!MODO_PWA) {
         mudarSecao('inicio');
         return;
@@ -143,7 +203,6 @@ function restaurarEstadoNavegacao() {
         console.warn('Não foi possível recuperar a navegação:', erro);
     }
 
-    // Se não houver navegação salva, abre a página inicial
     if (!estadoSalvo) {
         mudarSecao('inicio');
         return;
@@ -199,7 +258,7 @@ function restaurarEstadoNavegacao() {
     }
 
     // Recupera as demais seções
-else {
+    else {
         mudarSecao(estadoSalvo.secao);
         if (estadoSalvo.secao === 'em-alta') {
             renderizarEmAlta();
@@ -215,7 +274,6 @@ else {
     });
 }
 
-
 // Salva a posição de rolagem enquanto o usuário navega
 window.addEventListener('scroll', () => {
     if (!MODO_PWA || restaurandoEstado) return;
@@ -226,7 +284,6 @@ window.addEventListener('scroll', () => {
         salvarEstadoNavegacao();
     }, 300);
 });
-
 
 // Salva o estado quando o aplicativo vai para segundo plano
 document.addEventListener('visibilitychange', () => {
@@ -273,7 +330,7 @@ function exibirLivros(lista, titulo = "Todos os Livros do Acervo") {
         let arquivoImg = titulo
             .toLowerCase()
             .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[̀-ͯ]/g, "")
             .replace(/\s+/g, '-');
        
         if (
@@ -345,7 +402,7 @@ function exibirLivros(lista, titulo = "Todos os Livros do Acervo") {
                 <h3 onclick="abrirDetalhes(${livro.id})" class="livro-link">${livro.titulo}</h3>
                 ${responsavelTexto}
                 ${infoDownloads}
-                <p><strong>Avaliação:</strong> ⭐ ${livro.avaliacaoMedia} / 5</p>
+                <p><strong>Avaliação:</strong> ⭐ <span id="card-media-${livro.id}">${livro.avaliacaoMedia}</span> / 5</p>
             </div>
             <div class="card-acoes">
                 ${botaoAcao}
@@ -396,7 +453,7 @@ function normalizarTexto(texto) {
     return (texto || '')
         .toString()
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[̀-ͯ]/g, '')
         .toLowerCase()
         .trim();
 }
@@ -454,7 +511,6 @@ function abrirDetalhes(id) {
         ? '' 
         : `<p><strong>Downloads realizados:</strong> ${livro.downloads}</p>`;
 
-    // Aviso em destaque caso seja do Portal da USP
     let avisoFonteUSP = livro.tipoAcao === 'externo'
         ? `<div style="background: var(--cor-papel-escuro); padding: 10px; border-left: 4px solid var(--cor-luz); margin: 15px 0; border-radius: 4px;">
                <p style="margin: 0; font-weight: 500; color: var(--cor-principal);"><strong>Fonte:</strong> Portal de Livros Abertos da USP</p>
@@ -467,7 +523,7 @@ function abrirDetalhes(id) {
         ${responsavelDetalhe}
         <p><strong>Número de Páginas:</strong> ${livro.paginas}</p>
         ${infoDetalheDownloads}
-        <p><strong>Média de Avaliação:</strong> ⭐ ${livro.avaliacaoMedia} / 5</p>
+        <p><strong>Média de Avaliação:</strong> ⭐ <span id="detalhe-media-${livro.id}">${livro.avaliacaoMedia}</span> / 5</p>
         <hr style="margin: 15px 0;">
         <p><strong>Sinopse / Descrição:</strong></p>
         <p>${livro.desc}</p>
@@ -490,7 +546,7 @@ function abrirDetalhes(id) {
         <div class="comentarios-secao" style="margin-top: 20px;">
             <h3>💬 Comentários da Comunidade</h3>
             <div id="lista-comentarios-${livro.id}" style="margin: 15px 0;">
-                ${livro.comentarios.length === 0 ? '<p>Nenhum comentário ainda. Seja o primeiro a comentar!</p>' : livro.comentarios.map(c => `<div class="comment-item"><strong>${c.usuario}:</strong><p>${c.texto}</p></div>`).join('')}
+                <p>Carregando avaliações...</p>
             </div>
             
             <div class="form-comentario">
@@ -505,6 +561,8 @@ function abrirDetalhes(id) {
     estadoNavegacao.livroId = id;
 
     salvarEstadoNavegacao();
+
+    carregarAvaliacoesFirestore(id);
 }
 
 function registrarDownload(id) {
@@ -521,28 +579,115 @@ function registrarDownload(id) {
     }
 }
 
-function avaliarLivro(id, nota) {
-    if(!usuarioLogado) {
+async function carregarAvaliacoesFirestore(livroId) {
+    const listaEl = document.getElementById(`lista-comentarios-${livroId}`);
+    const detalheMediaEl = document.getElementById(`detalhe-media-${livroId}`);
+    const cardMediaEl = document.getElementById(`card-media-${livroId}`);
+    const livro = livros.find(l => l.id === livroId);
+    if (!livro) return;
+
+    try {
+        const q = query(collection(db, 'avaliacoes'), where('livroId', '==', livroId));
+        const snapshot = await getDocs(q);
+
+        const notas = [];
+        const comentarios = [];
+
+        snapshot.forEach(docSnap => {
+            const dados = docSnap.data();
+            if (dados.tipo === 'nota' && typeof dados.nota === 'number') {
+                notas.push(dados.nota);
+            }
+            if (dados.tipo === 'comentario' && dados.texto) {
+                comentarios.push(dados);
+            }
+        });
+
+        // Ordena comentários do mais antigo para o mais recente
+        comentarios.sort((a, b) => (a.criadoEm || '').localeCompare(b.criadoEm || ''));
+
+        if (notas.length > 0) {
+            const soma = notas.reduce((acc, n) => acc + n, 0);
+            livro.avaliacaoMedia = (soma / notas.length).toFixed(1);
+        } else {
+            livro.avaliacaoMedia = '0.0';
+        }
+
+        if (detalheMediaEl) detalheMediaEl.textContent = livro.avaliacaoMedia;
+        if (cardMediaEl) cardMediaEl.textContent = livro.avaliacaoMedia;
+
+        livro.comentarios = comentarios.map(c => ({
+            usuario: c.usuario,
+            texto: c.texto
+        }));
+
+        if (listaEl) {
+            if (livro.comentarios.length === 0) {
+                listaEl.innerHTML = '<p>Nenhum comentário ainda. Seja o primeiro a comentar!</p>';
+            } else {
+                listaEl.innerHTML = livro.comentarios
+                    .map(c => `<div class="comment-item"><strong>${c.usuario}:</strong><p>${c.texto}</p></div>`)
+                    .join('');
+            }
+        }
+    } catch (erro) {
+        console.error('Erro ao carregar avaliações do Firestore:', erro);
+        if (listaEl) {
+            listaEl.innerHTML = '<p>Nenhum comentário ainda. Seja o primeiro a comentar!</p>';
+        }
+    }
+}
+
+async function avaliarLivro(id, nota) {
+    if (!usuarioLogado) {
         alert('Faça login com seu nome e e-mail no topo da página para avaliar!');
         return;
     }
-    const livro = livros.find(l => l.id === id);
-    livro.avaliacaoMedia = ((Number(livro.avaliacaoMedia) + nota) / 2).toFixed(1);
-    alert(`Obrigado por avaliar! Nova média do livro: ${livro.avaliacaoMedia} ⭐`);
-    abrirDetalhes(id);
+
+    try {
+        await addDoc(collection(db, 'avaliacoes'), {
+            livroId: id,
+            tipo: 'nota',
+            nota: Number(nota),
+            usuario: usuarioLogado.nome,
+            email: usuarioLogado.email,
+            criadoEm: new Date().toISOString()
+        });
+
+        await carregarAvaliacoesFirestore(id);
+        const livro = livros.find(l => l.id === id);
+        alert(`Obrigado por avaliar! Nova média do livro: ${livro ? livro.avaliacaoMedia : nota} ⭐`);
+    } catch (erro) {
+        console.error('Erro ao salvar nota:', erro);
+        alert('Não foi possível salvar sua avaliação agora. Verifique a conexão ou as chaves do Firebase.');
+    }
 }
 
-function adicionarComentario(id) {
-    if(!usuarioLogado) {
+async function adicionarComentario(id) {
+    if (!usuarioLogado) {
         alert('Faça login no topo da página para enviar um comentário.');
         return;
     }
-    const textoInput = document.getElementById(`comentario-texto-${id}`);
-    if(!textoInput || textoInput.value.trim() === '') return;
 
-    const livro = livros.find(l => l.id === id);
-    livro.comentarios.push({ usuario: usuarioLogado.nome, texto: textoInput.value });
-    abrirDetalhes(id);
+    const textoInput = document.getElementById(`comentario-texto-${id}`);
+    if (!textoInput || textoInput.value.trim() === '') return;
+
+    try {
+        await addDoc(collection(db, 'avaliacoes'), {
+            livroId: id,
+            tipo: 'comentario',
+            texto: textoInput.value.trim(),
+            usuario: usuarioLogado.nome,
+            email: usuarioLogado.email,
+            criadoEm: new Date().toISOString()
+        });
+
+        textoInput.value = '';
+        await carregarAvaliacoesFirestore(id);
+    } catch (erro) {
+        console.error('Erro ao salvar comentário:', erro);
+        alert('Não foi possível publicar seu comentário agora. Verifique a conexão ou as chaves do Firebase.');
+    }
 }
 
 function renderizarEmAlta() {
@@ -651,14 +796,12 @@ const menuDropdown = document.querySelector('.dropdown');
 const botaoDropdown = document.querySelector('.dropdown > a');
 
 if (menuDropdown && botaoDropdown) {
-    // Alterna abertura/fechamento ao clicar ou tocar em "Acervo Digital ▼"
     botaoDropdown.addEventListener('click', function (e) {
         e.preventDefault();
         menuDropdown.classList.remove('fechado');
         menuDropdown.classList.toggle('aberto');
     });
 
-    // Fecha imediatamente ao escolher qualquer gênero da lista
     menuDropdown.querySelectorAll('.dropdown-content a').forEach(link => {
         link.addEventListener('click', function () {
             menuDropdown.classList.remove('aberto');
@@ -692,12 +835,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const CHAVE_STORAGE = 'lumen_sp_ocultar_boas_vindas';
   const jaOcultou = localStorage.getItem(CHAVE_STORAGE) === 'true';
 
-  // Verifica se o usuário já está rodando o PWA instalado na tela inicial
   const emModoApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
   // Exibe a mensagem apenas se não tiver marcado a opção e não estiver no app instalado
   if (!jaOcultou && !emModoApp) {
-    // Pequeno atraso de 600ms para a página carregar suavemente antes de abrir o aviso
     setTimeout(() => {
       modal.classList.add('ativo');
       modal.setAttribute('aria-hidden', 'false');
@@ -722,3 +863,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// EXPÕE AS FUNÇÕES NO ESCOPO GLOBAL PARA OS onclick DO index.html
+window.fazerLogin = fazerLogin;
+window.sairConta = sairConta;
+window.mudarSecao = mudarSecao;
+window.filtrarCategoria = filtrarCategoria;
+window.buscarLivros = buscarLivros;
+window.abrirDetalhes = abrirDetalhes;
+window.registrarDownload = registrarDownload;
+window.avaliarLivro = avaliarLivro;
+window.adicionarComentario = adicionarComentario;
+window.publicarTopico = publicarTopico;
