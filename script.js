@@ -2,10 +2,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import {
     getFirestore,
     collection,
+    doc,
     addDoc,
+    setDoc,
     getDocs,
     query,
-    where
+    where,
+    increment
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -61,15 +64,12 @@ let livros = [
 let usuarioLogado = null;
 let topicosForum = [];
 
-// Identifica se o Lumen SP está aberto como aplicativo
 const MODO_PWA =
     window.matchMedia('(display-mode: standalone)').matches ||
     window.navigator.standalone === true;
 
-// Chave utilizada para armazenar a última navegação
 const CHAVE_ESTADO = 'lumenSP_estado_navegacao';
 
-// Informações da última página visitada
 let estadoNavegacao = {
     secao: 'inicio',
     genero: 'todos',
@@ -112,6 +112,85 @@ function carregarDownloadsSalvos() {
         console.warn('Não foi possível carregar os downloads salvos:', erro);
     }
 }
+
+async function sincronizarDownloadsFirestore() {
+    try {
+        const snapshot = await getDocs(collection(db, 'downloads_livros'));
+        const mapaNuvem = {};
+
+        snapshot.forEach(docSnap => {
+            const dados = docSnap.data();
+            const idNum = Number(dados.livroId ?? docSnap.id);
+            if (!Number.isNaN(idNum)) {
+                mapaNuvem[idNum] = Number(dados.total) || 0;
+            }
+        });
+
+        livros.forEach(livro => {
+            if (livro.tipoAcao !== 'externo') {
+                const totalNuvem = mapaNuvem[livro.id];
+                const totalLocal = Number(livro.downloads) || 0;
+                if (typeof totalNuvem === 'number') {
+                    livro.downloads = Math.max(totalNuvem, totalLocal);
+                }
+            }
+        });
+
+        salvarDownloads();
+
+        // Atualiza contadores visíveis na grade atual ou em "Em Alta"
+        const secAcervo = document.getElementById('sec-acervo');
+        if (secAcervo && secAcervo.style.display !== 'none') {
+            const tituloEl = document.getElementById('titulo-categoria');
+            const tituloAtual = tituloEl ? tituloEl.innerText.trim() : '';
+            if (estadoNavegacao.busca) {
+                buscarLivros();
+            } else if (estadoNavegacao.genero && estadoNavegacao.genero !== 'todos') {
+                const filtrados = livros.filter(l => l.genero === estadoNavegacao.genero);
+                exibirLivros(filtrados, tituloAtual || estadoNavegacao.genero);
+            } else {
+                exibirLivros(livros, "Todos os Livros do Acervo");
+            }
+        }
+
+        const secEmAlta = document.getElementById('sec-em-alta');
+        if (secEmAlta && secEmAlta.style.display !== 'none') {
+            renderizarEmAlta();
+        }
+    } catch (erro) {
+        console.warn('Não foi possível sincronizar downloads do Firestore:', erro);
+    }
+}
+
+async function incrementarDownloadFirestore(livroId, novoTotalLocal) {
+    try {
+        const docRef = doc(db, 'downloads_livros', String(livroId));
+        await setDoc(
+            docRef,
+            {
+                livroId: Number(livroId),
+                total: increment(1),
+                atualizadoEm: new Date().toISOString()
+            },
+            { merge: true }
+        );
+        const snap = await getDocs(collection(db, 'downloads_livros'));
+        snap.forEach(d => {
+            const data = d.data();
+            const idNum = Number(data.livroId ?? d.id);
+            if (idNum === Number(livroId) && typeof data.total === 'number') {
+                const livro = livros.find(l => l.id === idNum);
+                if (livro) {
+                    livro.downloads = Math.max(data.total, novoTotalLocal);
+                    salvarDownloads();
+                }
+            }
+        });
+    } catch (erro) {
+        console.warn('Erro ao salvar download no Firestore:', erro);
+    }
+}
+
 
 function renderizarAreaUsuario() {
     const userArea = document.getElementById('user-area');
@@ -164,6 +243,7 @@ function sairConta() {
     renderizarAreaUsuario();
 }
 
+
 carregarDownloadsSalvos();
 carregarUsuarioSalvo();
 
@@ -186,7 +266,6 @@ function salvarEstadoNavegacao() {
     }
 }
 
-// Recupera a última navegação do usuário no aplicativo
 function restaurarEstadoNavegacao() {
     if (!MODO_PWA) {
         mudarSecao('inicio');
@@ -257,7 +336,6 @@ function restaurarEstadoNavegacao() {
         }
     }
 
-    // Recupera as demais seções
     else {
         mudarSecao(estadoSalvo.secao);
         if (estadoSalvo.secao === 'em-alta') {
@@ -274,7 +352,6 @@ function restaurarEstadoNavegacao() {
     });
 }
 
-// Salva a posição de rolagem enquanto o usuário navega
 window.addEventListener('scroll', () => {
     if (!MODO_PWA || restaurandoEstado) return;
 
@@ -285,14 +362,12 @@ window.addEventListener('scroll', () => {
     }, 300);
 });
 
-// Salva o estado quando o aplicativo vai para segundo plano
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
         salvarEstadoNavegacao();
     }
 });
 
-// Salva o estado quando a página está sendo encerrada
 window.addEventListener('pagehide', salvarEstadoNavegacao);
 
 function mudarSecao(secaoId) {
@@ -313,6 +388,12 @@ function mudarSecao(secaoId) {
 
     if (secaoId === 'em-alta') {
         renderizarEmAlta();
+        sincronizarDownloadsFirestore();
+    }
+
+    if (secaoId === 'forum') {
+        renderizarForum();
+        carregarTopicosFirestore();
     }
 
     estadoNavegacao.secao = secaoId;
@@ -562,6 +643,7 @@ function abrirDetalhes(id) {
 
     salvarEstadoNavegacao();
 
+
     carregarAvaliacoesFirestore(id);
 }
 
@@ -570,8 +652,8 @@ function registrarDownload(id) {
     if (livro && livro.tipoAcao !== 'externo') {
         livro.downloads = (Number(livro.downloads) || 0) + 1;
         salvarDownloads();
+        incrementarDownloadFirestore(id, livro.downloads);
 
-        // Se a seção "Em Alta" estiver visível no momento, já atualiza a grade
         const secEmAlta = document.getElementById('sec-em-alta');
         if (secEmAlta && secEmAlta.style.display !== 'none') {
             renderizarEmAlta();
@@ -737,22 +819,73 @@ function renderizarEmAlta() {
     });
 }
 
-function publicarTopico(e) {
+async function carregarTopicosFirestore() {
+    const lista = document.getElementById('lista-topicos');
+    try {
+        const snapshot = await getDocs(collection(db, 'forum_topicos'));
+        const carregados = [];
+
+        snapshot.forEach(docSnap => {
+            const dados = docSnap.data();
+            if (dados && dados.titulo && dados.texto) {
+                carregados.push({
+                    usuario: dados.usuario || 'Estudante',
+                    genero: dados.genero || 'Geral',
+                    titulo: dados.titulo,
+                    texto: dados.texto,
+                    criadoEm: dados.criadoEm || ''
+                });
+            }
+        });
+
+        carregados.sort((a, b) => (b.criadoEm || '').localeCompare(a.criadoEm || ''));
+        topicosForum = carregados;
+        if (lista) {
+            renderizarForum();
+        }
+    } catch (erro) {
+        console.warn('Não foi possível carregar os tópicos do fórum:', erro);
+    }
+}
+
+async function publicarTopico(e) {
     e.preventDefault();
     if(!usuarioLogado) {
         alert('Faça login no topo da página para publicar no fórum.');
         return;
     }
     const genero = document.getElementById('forum-genero').value;
-    const titulo = document.getElementById('forum-titulo').value;
-    const texto = document.getElementById('forum-texto').value;
+    const titulo = document.getElementById('forum-titulo').value.trim();
+    const texto = document.getElementById('forum-texto').value.trim();
 
-    topicosForum.unshift({ usuario: usuarioLogado.nome, genero, titulo, texto });
-    
-    document.getElementById('forum-titulo').value = '';
-    document.getElementById('forum-texto').value = '';
-    renderizarForum();
-    alert('Tópico publicado com sucesso no fórum!');
+    if (!genero || !titulo || !texto) return;
+
+    const novoTopico = {
+        usuario: usuarioLogado.nome,
+        email: usuarioLogado.email,
+        genero,
+        titulo,
+        texto,
+        criadoEm: new Date().toISOString()
+    };
+
+    try {
+        await addDoc(collection(db, 'forum_topicos'), novoTopico);
+        topicosForum.unshift({
+            usuario: novoTopico.usuario,
+            genero: novoTopico.genero,
+            titulo: novoTopico.titulo,
+            texto: novoTopico.texto
+        });
+
+        document.getElementById('forum-titulo').value = '';
+        document.getElementById('forum-texto').value = '';
+        renderizarForum();
+        alert('Tópico publicado com sucesso no fórum!');
+    } catch (erro) {
+        console.error('Erro ao publicar tópico no Firestore:', erro);
+        alert('Não foi possível publicar o tópico agora. Verifique a conexão ou as chaves do Firebase.');
+    }
 }
 
 function renderizarForum() {
@@ -778,10 +911,13 @@ function renderizarForum() {
     });
 }
 
-// Ao carregar, restaura a navegação no PWA
-window.addEventListener('load', restaurarEstadoNavegacao);
 
-// Fecha o menu dropdown ao selecionar um gênero literário
+window.addEventListener('load', () => {
+    restaurarEstadoNavegacao();
+    sincronizarDownloadsFirestore();
+    carregarTopicosFirestore();
+});
+
 document.querySelectorAll('.dropdown-content a').forEach(link => {
     link.addEventListener('click', function () {
         const dropdown = this.closest('.dropdown');
@@ -802,6 +938,7 @@ if (menuDropdown && botaoDropdown) {
         menuDropdown.classList.toggle('aberto');
     });
 
+    // Fecha imediatamente ao escolher qualquer gênero da lista
     menuDropdown.querySelectorAll('.dropdown-content a').forEach(link => {
         link.addEventListener('click', function () {
             menuDropdown.classList.remove('aberto');
@@ -835,10 +972,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const CHAVE_STORAGE = 'lumen_sp_ocultar_boas_vindas';
   const jaOcultou = localStorage.getItem(CHAVE_STORAGE) === 'true';
 
+  // Verifica se o usuário já está rodando o PWA instalado na tela inicial
   const emModoApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-  // Exibe a mensagem apenas se não tiver marcado a opção e não estiver no app instalado
   if (!jaOcultou && !emModoApp) {
+
     setTimeout(() => {
       modal.classList.add('ativo');
       modal.setAttribute('aria-hidden', 'false');
@@ -864,7 +1002,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// EXPÕE AS FUNÇÕES NO ESCOPO GLOBAL PARA OS onclick DO index.html
 window.fazerLogin = fazerLogin;
 window.sairConta = sairConta;
 window.mudarSecao = mudarSecao;
