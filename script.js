@@ -31,7 +31,7 @@ let livros = [
     { id: 4, titulo: "Helena", autor: "Machado de Assis", genero: "Romance", paginas: 93, desc: "Após a morte do Conselheiro Vale, seu testamento revela que Helena, uma jovem desconhecida, é filha dele e deve ser acolhida pela família. Ela conquista a todos com sua delicadeza, mas guarda um segredo que a faz viver entre a dissimulação e a culpa. Seu convívio com o “irmão” Estácio vai se tornando um amor impossível. É um romance de feição ainda romântica, com um desfecho trágico.", downloads: 0, avaliacaoMedia: 0.0, arquivo: "assets/livros/helena-machado-r.pdf", tipoAcao: "download", comentarios: [] },
     { id: 5, titulo: "Quincas Borba", autor: "Machado de Assis", genero: "Romance", paginas: 314, desc: "O professor Rubião herda a fortuna do filósofo Quincas Borba, criador do Humanitismo, com a condição de cuidar do cão que leva o mesmo nome. Rubião se muda para o Rio de Janeiro e vira presa fácil de aproveitadores, como Palha e Sofia, por quem se apaixona. Aos poucos, perde o dinheiro e a razão. O romance mostra a ambição e a crueldade de uma sociedade que vive de aparências.", downloads: 0, avaliacaoMedia: 0.0, arquivo: "assets/livros/quincasborba-machado-r.pdf", tipoAcao: "download", comentarios: [] },
     { id: 6, titulo: "Memórias Póstumas de Brás Cubas", autor: "Machado de Assis", genero: "Romance", paginas: 145, desc: "O próprio Brás Cubas, já morto, conta sua vida com ironia e sem pudores, dedicando o livro “ao verme que primeiro roeu as frias carnes do meu cadáver”. Ele relembra seus amores, em especial Virgília, sua ambição política frustrada e a convivência com Quincas Borba. O livro inaugura o Realismo no Brasil e faz uma crítica ácida à vaidade e à hipocrisia da elite do século XIX.", downloads: 0, avaliacaoMedia: 0.0, arquivo: "assets/livros/memorias-postumas-machado-r.pdf", tipoAcao: "download", comentarios: [] },
-    { id: 7, titulo: "A Divina Comédia", autor: "Dante Alighieri", genero: "Poesia", paginas: 788, desc: "O poeta Dante narra sua viagem pelo além-túmulo: guiado por Virgílio, atravessa o Inferno e o Purgatório, e, por Beatriz, chega ao Paraíso. A cada etapa, encontra figuras históricas, mitológicas e conhecidos seus, punidos ou recompensados conforme suas ações. É uma grande alegoria da busca da alma por Deus, e um retrato da Idade Média, de sua fé e de sua política.", downloads: 0, avaliacaoMedia: 0.0, arquivo: "adivinacomedia-dantealighieri-p.pdf", tipoAcao: "download", comentarios: [] },
+    { id: 7, titulo: "A Divina Comédia", autor: "Dante Alighieri", genero: "Poesia", paginas: 788, desc: "O poeta Dante narra sua viagem pelo além-túmulo: guiado por Virgílio, atravessa o Inferno e o Purgatório, e, por Beatriz, chega ao Paraíso. A cada etapa, encontra figuras históricas, mitológicas e conhecidos seus, punidos ou recompensados conforme suas ações. É uma grande alegoria da busca da alma por Deus, e um retrato da Idade Média, de sua fé e de sua política.", downloads: 0, avaliacaoMedia: 0.0, arquivo: "assets/livros/adivinacomedia-dantealighieri-p.pdf", tipoAcao: "download", comentarios: [] },
     { id: 8, titulo: "O Navio Negreiro", autor: "Castro Alves", genero: "Poesia", paginas: 15, desc: "Poema narrativo em que o eu lírico, no alto-mar, vê um navio carregado de africanos escravizados. A cena começa com a beleza do oceano e logo se transforma em horror, ao descrever a dor, a violência e o desespero no porão. No final, o poeta clama contra a escravidão e pede que a bandeira brasileira não cubra tamanha vergonha. É um dos maiores textos da poesia abolicionista.", downloads: 0, avaliacaoMedia: 0.0, arquivo: "assets/livros/onavionegreiro-castroalves-p.pdf", tipoAcao: "download", comentarios: [] },
     { id: 9, titulo: "Vidas Secas", autor: "Graciliano Ramos", genero: "Romance", paginas: 204, desc: "Fabiano, Sinhá Vitória, os dois filhos e a cachorra Baleia fogem da seca pelo sertão nordestino em busca de sobrevivência. Quase sem palavras, vivem humilhados pela pobreza e pela autoridade, mas sonham com uma vida melhor. A morte de Baleia é uma das cenas mais comoventes da nossa literatura. O livro é um retrato seco e humano da miséria no Nordeste.", downloads: 0, avaliacaoMedia: 0.0, arquivo: "assets/livros/vidassecas-graciliano-r.pdf", tipoAcao: "download", comentarios: [] },
     { id: 10, titulo: "Os Maias", autor: "Eça de Queirós", genero: "Romance", paginas: 288, desc: "Acompanha três gerações da família Maia, em especial Carlos da Maia, jovem médico culto e rico que vive na Lisboa do século XIX. Ele se apaixona por Maria Eduarda, sem saber que um segredo do passado liga os dois. Entre bailes, jantares e intrigas, o romance critica a sociedade portuguesa e termina em tragédia.", downloads: 0, avaliacaoMedia: 0.0, arquivo: "assets/livros/osmaias-queiros-r.pdf", tipoAcao: "download", comentarios: [] },
@@ -267,7 +267,9 @@ function salvarEstadoNavegacao() {
 }
 
 function restaurarEstadoNavegacao() {
+    // Se não estiver rodando como aplicativo PWA instalado, inicia sempre limpo na tela inicial
     if (!MODO_PWA) {
+        restaurandoEstado = false;
         mudarSecao('inicio');
         return;
     }
@@ -308,46 +310,37 @@ function restaurarEstadoNavegacao() {
         ...estadoSalvo
     };
 
-    // Recupera o acervo, a categoria ou a pesquisa
-    if (estadoSalvo.secao === 'acervo') {
-        const campoBusca = document.getElementById('input-busca');
+    try {
+        if (estadoSalvo.secao === 'acervo') {
+            const campoBusca = document.getElementById('input-busca');
+            if (campoBusca) {
+                campoBusca.value = estadoSalvo.busca || '';
+            }
 
-        if (campoBusca) {
-            campoBusca.value = estadoSalvo.busca || '';
-        }
+            if (estadoSalvo.busca) {
+                buscarLivros();
+            } else {
+                filtrarCategoria(estadoSalvo.genero || 'todos');
+            }
+        } else if (estadoSalvo.secao === 'detalhes') {
+            const livroExiste = livros.some(
+                livro => livro.id === Number(estadoSalvo.livroId)
+            );
 
-        if (estadoSalvo.busca) {
-            buscarLivros();
+            if (livroExiste) {
+                abrirDetalhes(Number(estadoSalvo.livroId));
+            } else {
+                mudarSecao('inicio');
+            }
         } else {
-            filtrarCategoria(estadoSalvo.genero || 'todos');
+            mudarSecao(estadoSalvo.secao);
         }
+    } finally {
+        restaurandoEstado = false;
     }
 
-    // Recupera os detalhes do último livro consultado
-    else if (estadoSalvo.secao === 'detalhes') {
-        const livroExiste = livros.some(
-            livro => livro.id === Number(estadoSalvo.livroId)
-        );
-
-        if (livroExiste) {
-            abrirDetalhes(Number(estadoSalvo.livroId));
-        } else {
-            mudarSecao('inicio');
-        }
-    }
-
-    else {
-        mudarSecao(estadoSalvo.secao);
-        if (estadoSalvo.secao === 'em-alta') {
-            renderizarEmAlta();
-        }
-    }
-
-    // Recupera a posição da página
     requestAnimationFrame(() => {
         window.scrollTo(0, Number(estadoSalvo.scrollY) || 0);
-
-        restaurandoEstado = false;
         salvarEstadoNavegacao();
     });
 }
@@ -495,7 +488,6 @@ function exibirLivros(lista, titulo = "Todos os Livros do Acervo") {
 }
 
 function filtrarCategoria(genero) {
-    const posicaoScrollAtual = window.scrollY;
     const secoes = ['inicio', 'detalhes', 'em-alta', 'forum', 'contato'];
 
     secoes.forEach(s => {
@@ -518,13 +510,10 @@ function filtrarCategoria(genero) {
         exibirLivros(filtrados, genero);
     }
 
-    // Mantém a posição da tela estável após atualizar a grade de livros
-    requestAnimationFrame(() => {
-        window.scrollTo({
-            top: posicaoScrollAtual,
-            behavior: 'instant'
-        });
-    });
+    // Só rola para o topo do acervo se não estiver restaurando posição do PWA
+    if (!restaurandoEstado && secaoAcervo) {
+        secaoAcervo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
     salvarEstadoNavegacao();
 }
