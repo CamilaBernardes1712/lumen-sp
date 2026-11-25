@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'lumen-sp-v4';
+const CACHE_NAME = 'lumen-sp-v5';
 
 const ARQUIVOS_CACHE = [
   'index.html',

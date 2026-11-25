@@ -250,13 +250,11 @@ carregarUsuarioSalvo();
 let restaurandoEstado = false;
 let temporizadorScroll = null;
 
-// Salva o estado atual da navegação no aplicativo
 function salvarEstadoNavegacao() {
     if (!MODO_PWA || restaurandoEstado) return;
 
     try {
         estadoNavegacao.scrollY = window.scrollY;
-
         localStorage.setItem(
             CHAVE_ESTADO,
             JSON.stringify(estadoNavegacao)
@@ -267,9 +265,16 @@ function salvarEstadoNavegacao() {
 }
 
 function restaurarEstadoNavegacao() {
-    // Se não estiver rodando como aplicativo PWA instalado, inicia sempre limpo na tela inicial
+    // Se abriu por link comum ou WhatsApp (não em modo PWA standalone), inicia sempre em 'inicio'
     if (!MODO_PWA) {
         restaurandoEstado = false;
+        estadoNavegacao = {
+            secao: 'inicio',
+            genero: 'todos',
+            busca: '',
+            livroId: null,
+            scrollY: 0
+        };
         mudarSecao('inicio');
         return;
     }
@@ -961,11 +966,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const CHAVE_STORAGE = 'lumen_sp_ocultar_boas_vindas';
   const jaOcultou = localStorage.getItem(CHAVE_STORAGE) === 'true';
 
-  // Verifica se o usuário já está rodando o PWA instalado na tela inicial
-  const emModoApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
-  if (!jaOcultou && !emModoApp) {
-
+  // Exibe tanto no site quanto no app, a menos que o usuário tenha optado por não mostrar novamente
+  if (!jaOcultou) {
     setTimeout(() => {
       modal.classList.add('ativo');
       modal.setAttribute('aria-hidden', 'false');
@@ -980,10 +982,10 @@ document.addEventListener('DOMContentLoaded', () => {
     modal.setAttribute('aria-hidden', 'true');
   }
 
-  btnEntrar.addEventListener('click', fecharModal);
-  btnFecharX.addEventListener('click', fecharModal);
+  if (btnEntrar) btnEntrar.addEventListener('click', fecharModal);
+  if (btnFecharX) btnFecharX.addEventListener('click', fecharModal);
 
-  // Permite fechar clicando fora da caixa 
+  // Permite fechar clicando fora da caixa
   modal.addEventListener('click', (evento) => {
     if (evento.target === modal) {
       fecharModal();
